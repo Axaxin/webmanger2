@@ -13,10 +13,25 @@ services:
       - ./npm/data:/data
       - ./npm/letsencrypt:/etc/letsencrypt
     network_mode: bridge
+  
+  browser:
+    container_name: filebrowser
+    restart: unless-stopped
+    depends_on:
+      - nginx-proxy-manager
+    volumes:
+      - '/root:/srv'
+      - './filebrowser/data:/data'
+      #- './filebrowser/filebrowser.db:/database.db'
+      #- './filebrowser/.filebrowser.json:/.filebrowser.json'
+    image: filebrowser/filebrowser
+    network_mode: bridge
 
-      
   v2fly-core:
     container_name: v2fly
+    depends_on:
+      - browser
+      - nginx-proxy-manager
     volumes:
       - './v2fly:/etc/v2ray'
     restart: unless-stopped
@@ -50,16 +65,4 @@ services:
 #       - WARD_THEME=light
 #       - WARD_NAME=server-monitor
 #     privileged: true
-  
-  browser:
-    container_name: filebrowser
-    restart: unless-stopped
-    depends_on:
-      - nginx-proxy-manager
-    volumes:
-      - '/root:/srv'
-      - './filebrowser/data:/data'
-      #- './filebrowser/filebrowser.db:/database.db'
-      #- './filebrowser/.filebrowser.json:/.filebrowser.json'
-    image: filebrowser/filebrowser
-    network_mode: bridge
+
